@@ -79,7 +79,7 @@ def tratar_metadates(prefix: str, metadata: str)-> dict:
                 if not valor.isalpha():
                     raise ValueError("El color no es valido")
         else: 
-            raise ErroValue("Metadato invalido para el tipo de hub o conexion")
+            raise ValueError("Metadato invalido para el tipo de hub o conexion")
 
         if len(comprobation_repes) != len(set(comprobation_repes)):
             raise ValueError("Metadato repetido")
@@ -99,12 +99,12 @@ def trate_mild_part(prefix: str, mild_part:str)-> list:
         if "-" not in mild_part:
             raise ValueError("Las zonas no están separadas por un guion")
         else:
-            zona_a, _, zona_b = mild_part.partition()
+            zona_a, _, zona_b = mild_part.partition("-")
             return (zona_a.strip(), zona_b.strip())
     
     else:
         tokens = mild_part.split()
-        if tokens.len() != 3:
+        if len(tokens) != 3:
             raise ValueError ("La sintaxis de la zona esta mal")
         
         else:
@@ -141,10 +141,10 @@ def get_nb_drones(data_line: tuple[int, str]):
         return num_drones
 
 
-def parse_lines(lines: list[tuple[int, str]])-> list[str, list[tuple] ]:
+def parse_lines(lines: list[tuple[int, str]])-> tuple[str, list[tuple] ]:
 
     clean_data_lines: list[tuple] = []
-    final_result : list[str, list[tuple] ] = []
+    final_result : tuple[str, list[tuple] ] = []
 
     nb_drones = get_nb_drones(lines[0])
 
@@ -179,7 +179,7 @@ def parse_lines(lines: list[tuple[int, str]])-> list[str, list[tuple] ]:
         except ValueError as e:
             print(f"Sintax error in line {num_line}: {e}")
 
-        clean_data_lines.append(prefix,tokens_mild_part, metadata_dict)
+        clean_data_lines.append((prefix,tokens_mild_part, metadata_dict))
     
     final_result = [nb_drones, clean_data_lines]
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     lines: list[tuple[int, str]] = clean_tex(file)
 
     
-    clean_data: list[str, list[tuple[str, str, list[str], dict]]] = parse_lines(lines)
+    clean_data: tuple[str, list[tuple[str, str, list[str], dict]]] = parse_lines(lines)
 
 
 
