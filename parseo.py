@@ -146,7 +146,11 @@ def metadata_ok(line: str, prefix: str) -> dict:
             raise ValueError(f"Metadato repetido: {key}")
         comprobation_repes.append(key)
 
+        if (prefix == "start_hub" or prefix == "end_hub") and key =="max_drones":
+            rest = " ".join(parts[1:])
+       
         asignar_values(prefix, key, value)
+
         metadata_dict[key] = value
 
         rest = " ".join(parts[1:])
