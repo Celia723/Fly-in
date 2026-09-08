@@ -191,17 +191,3 @@ if __name__ == "__main__":
             print(f"Processed valid lines: {len(parsed_data)}")
         except ValueError as e:
             print(e)
-
-    
-
-
-    
-
-
-
-
-
-
-
-
-
