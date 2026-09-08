@@ -47,54 +47,58 @@ class Grapho:
         self.start_hub: StartHub | None = None
         self.end_hub: EndHub | None = None
     
-        def add_connection(self, connection: Connection) -> None:
-            # 1. Comprobar autociclo
-            if connection.zone_a == connection.zone_b:
-                raise ValueError("A connection cannot link a hub to itself")
+    def add_connection(self, connection: Connection) -> None:
+        # 1. Comprobar autociclo
+        if connection.zone_a == connection.zone_b:
+            raise ValueError("A connection cannot link a hub to itself")
 
-            # 2. Comprobar que ambos hubs existen en el grafo
-            if connection.zone_a not in self.hubs or connection.zone_b not in self.hubs:
-                raise ValueError("Connection requires hubs that do not exist")
+        # 2. Comprobar que ambos hubs existen en el grafo
+        if connection.zone_a not in self.hubs or connection.zone_b not in self.hubs:
+            raise ValueError("Connection requires hubs that do not exist")
 
-            # 3. Ordenar los nombres alfabéticamente para normalizar la dirección
-            if connection.zone_a > connection.zone_b:
-                connection.zone_a, connection.zone_b = (
-                    connection.zone_b,
-                    connection.zone_a,
-                )
+        # 3. Ordenar los nombres alfabéticamente para normalizar la dirección
+        if connection.zone_a > connection.zone_b:
+            connection.zone_a, connection.zone_b = (
+                connection.zone_b,
+                connection.zone_a,
+            )
 
-            # 4. Comprobar si ya existe la tupla ordenada en nuestro set de control
-            pair = (connection.zone_a, connection.zone_b)
-            if pair in self.connection_pairs:
-                raise ValueError("The connection already exists")
+        # 4. Comprobar si ya existe la tupla ordenada en nuestro set de control
+        pair = (connection.zone_a, connection.zone_b)
+        if pair in self.connection_pairs:
+            raise ValueError("The connection already exists")
 
-            # 5. Guardar en ambas estructuras
-            self.connection_pairs.add(pair)
-            self.connections.append(connection)
-                    
-
-
-        def add_hub(self, hub: Hub)-> None:
-            #primero vemos si el hub o su nombre por lo menos esta repetido
-
-            if hub.name in self.hubs:
-                raise ValueError("The hub is already exists")
-            elif (hub.x, hub.y) in self.coordenates:
-                raise ValueError("The coordenates already exist")
-            elif isinstance(hub, StartHub):
-                if self.start_hub is None:
-                    self.start_hub = hub
-                else:
-                    raise ValueError("A start_hub already exists")     
-            elif isinstance(hub, EndHub):
-                if self.end_hub is None:
-                    sel.end_hub = hub
-                    return
-                else:
-                    raise ValueError("A end_hub already exists")
-            
-            self.hubs.append[hub.name] = hub
-            self.coordenates.add((hub.x, hub.y))
+        # 5. Guardar en ambas estructuras
+        self.connection_pairs.add(pair)
+        self.connections.append(connection)
+                
 
 
+    def add_hub(self, hub: Hub)-> None:
+        #primero vemos si el hub o su nombre por lo menos esta repetido
+
+        if hub.name in self.hubs:
+            raise ValueError("The hub is already exists")
+        elif (hub.x, hub.y) in self.coordenates:
+            raise ValueError("The coordenates already exist")
+        elif isinstance(hub, StartHub):
+            if self.start_hub is None:
+                self.start_hub = hub
+            else:
+                raise ValueError("A start_hub already exists")     
+        elif isinstance(hub, EndHub):
+            if self.end_hub is None:
+                sel.end_hub = hub
+                return
+            else:
+                raise ValueError("A end_hub already exists")
         
+        self.hubs.append[hub.name] = hub
+        self.coordenates.add((hub.x, hub.y))
+
+
+    def validate_graph(self) -> None:
+        if self.start_hub is None:
+            raise ValueError("Graph validation failed: Missing StartHub.")
+        if self.end_hub is None:
+            raise ValueError("Graph validation failed: Missing EndHub.")
