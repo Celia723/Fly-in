@@ -40,26 +40,38 @@ class Grapho:
 
         self.conecctions: list[Connection]= []
 
+        self.connection_pairs = (
+            set()
+        )
+
         self.start_hub: StartHub | None = None
         self.end_hub: EndHub | None = None
     
-        def add_conecction(self, connection: Connection) -> None:
-            #comprobamos q no sea una conexion con el mismo
-            if connection.conecction_a == connection.conecction_b:
-                    raise ValueError("One conecction can't be with a same hub")
-            #primero veo si existen los hubs
-            elif connection.conecction_a not in self.hubs or connection.conecction_b not in connected.conecction_b:
-                raise ValueError("The connection requiers a hub that doesn't exist")
-            else:
-                #deues voy a hacer q siempre esten ordenados alfabeticamente de mayor  a menor 
-                # para q siempre enten ordenados igual y ver mas facil si hay duplicados
-                if connection.zone_a > connection.zone_b:
-                connection.zone_a, connection.zone_b = (connection.zone_b, connection.zone_a)
-                
-                if (connection.conecction_a, connection.conecction_b) in self.conecctions:
-                    raise ValueError("The conecction is repeat")
-                
-                self.append(connection)
+        def add_connection(self, connection: Connection) -> None:
+            # 1. Comprobar autociclo
+            if connection.zone_a == connection.zone_b:
+                raise ValueError("A connection cannot link a hub to itself")
+
+            # 2. Comprobar que ambos hubs existen en el grafo
+            if connection.zone_a not in self.hubs or connection.zone_b not in self.hubs:
+                raise ValueError("Connection requires hubs that do not exist")
+
+            # 3. Ordenar los nombres alfabéticamente para normalizar la dirección
+            if connection.zone_a > connection.zone_b:
+                connection.zone_a, connection.zone_b = (
+                    connection.zone_b,
+                    connection.zone_a,
+                )
+
+            # 4. Comprobar si ya existe la tupla ordenada en nuestro set de control
+            pair = (connection.zone_a, connection.zone_b)
+            if pair in self.connection_pairs:
+                raise ValueError("The connection already exists")
+
+            # 5. Guardar en ambas estructuras
+            self.connection_pairs.add(pair)
+            self.connections.append(connection)
+                    
 
 
         def add_hub(self, hub: Hub)-> None:
