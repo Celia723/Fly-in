@@ -17,6 +17,8 @@ if __name__ == "__main__":
             print(f" Drones detectados: {nb_drones}")
             print(f" Líneas válidas procesadas: {len(parsed_data)}")
 
+            grapho = models.Graph(nb_drones)
+
             #leo la lista con los componentes y creo objetos
             for data in parsed_data:
                 prefix = data[0]
@@ -29,10 +31,17 @@ if __name__ == "__main__":
                     element = models.EndHub(name, int(x), int(y), data[2])
                 elif prefix == "hub":
                     name, x, y = data[1]
-                    element = Hub(name, int(x), int(y), data[2])
+                    element = models.Hub(name, int(x), int(y), data[2])
                 elif prefix == "connection":
                     zone_a, zone_b = data[1]
                     element = models.Connection(zone_a, zone_b, data[2])
 
+                #Ahora q tengo el elemento objeto creado lo tengo q meter en grafo
+                if prefix == "connection":
+                    grapho.add_connection(element)
+                else:
+                    grapho.add_hub(element)
+
+            grapho.validate_graph()   
         except ValueError as e:
             print(e)

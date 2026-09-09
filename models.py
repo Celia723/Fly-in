@@ -41,11 +41,13 @@ class Grapho:
         self.conecctions: list[Connection]= []
 
         self.connection_pairs = (
-            set()
+            set(tuple)
         )
 
         self.start_hub: StartHub | None = None
         self.end_hub: EndHub | None = None
+
+        self.neighbors = {}
     
     def add_connection(self, connection: Connection) -> None:
         # 1. Comprobar autociclo
