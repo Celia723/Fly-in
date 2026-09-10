@@ -4,11 +4,11 @@ import models
 
 if __name__ == "__main__":
     file_path = "maps/easy/02_simple_fork.txt"
-    #file_path = "maps/easy/01_linear_path.txt"
-    #file_path = "maps/easy/03_basic_capacity.txt"
-    #file_path = "maps/medium/01_dead_end_trap.txt"
-    #file_path = "maps/medium/02_circular_loop.txt"
-    #file_path = "maps/medium/03_priority_puzzle.txt"
+    #   file_path = "maps/easy/01_linear_path.txt"
+    #   file_path = "maps/easy/03_basic_capacity.txt"
+    #   file_path = "maps/medium/01_dead_end_trap.txt"
+    #   file_path = "maps/medium/02_circular_loop.txt"
+    #   file_path = "maps/medium/03_priority_puzzle.txt"
 
     lines = clean_lines(file_path)
     if lines:
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
             grapho = models.Graph(nb_drones)
 
-            #leo la lista con los componentes y creo objetos
+            #   leo la lista con los componentes y creo objetos
             for data in parsed_data:
                 prefix = data[0]
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                     zone_a, zone_b = data[1]
                     element = models.Connection(zone_a, zone_b, data[2])
 
-                #Ahora q tengo el elemento objeto creado lo tengo q meter en grafo
+                #   Ahora q tengo el elemento objeto creado lo tengo q meter en grafo
                 if prefix == "connection":
                     grapho.add_connection(element)
                 else:

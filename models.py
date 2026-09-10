@@ -23,22 +23,22 @@ class EndHub(Hub):
         super().__init__(name, x, y, metadata)
         self.max_drones: float = float("inf")  # Capacidad infinita
 
+
 class Connection:
     def __init__(self, conecction_a: str, conecction_b: str, metadata: dict):
         self.conecction_a: str = conecction_a
         self.conecction_b: str = conecction_b
-
-    self.max_link_capacity: int = int(metadata.get("max_link_capacity", 1))
+        self.max_link_capacity: int = int(metadata.get("max_link_capacity", 1))
 
 
 class Grapho:
-    def __init__(self, nb_drones:int):
+    def __init__(self, nb_drones: int):
         self.nb_drones = nb_drones
 
         self.hubs: dict[str, Hub] = {}
-        self.coordenates: set[tuple[int, int]]= set()
+        self.coordenates: set[tuple[int, int]] = set()
 
-        self.conecctions: list[Connection]= []
+        self.conecctions: list[Connection] = []
 
         self.connection_pairs = (
             set(tuple)
@@ -73,11 +73,9 @@ class Grapho:
         # 5. Guardar en ambas estructuras
         self.connection_pairs.add(pair)
         self.connections.append(connection)
-                
 
-
-    def add_hub(self, hub: Hub)-> None:
-        #primero vemos si el hub o su nombre por lo menos esta repetido
+    def add_hub(self, hub: Hub) -> None:
+        # primero vemos si el hub o su nombre por lo menos esta repetido
 
         if hub.name in self.hubs:
             raise ValueError("The hub is already exists")
@@ -90,14 +88,13 @@ class Grapho:
                 raise ValueError("A start_hub already exists")     
         elif isinstance(hub, EndHub):
             if self.end_hub is None:
-                sel.end_hub = hub
+                self.end_hub = hub
                 return
             else:
                 raise ValueError("A end_hub already exists")
-        
+
         self.hubs.append[hub.name] = hub
         self.coordenates.add((hub.x, hub.y))
-
 
     def validate_graph(self) -> None:
         if self.start_hub is None:
