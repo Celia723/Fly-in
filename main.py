@@ -1,4 +1,4 @@
-from parse import clean_lines, parsed_syntax
+from parse import clean_text, parse_syntax
 import models  
 
 
@@ -10,14 +10,15 @@ if __name__ == "__main__":
     #   file_path = "maps/medium/02_circular_loop.txt"
     #   file_path = "maps/medium/03_priority_puzzle.txt"
 
-    lines = clean_lines(file_path)
-    if lines:
-        try:
-            nb_drones, parsed_data = parsed_syntax(lines)
+    try:
+        lines = clean_text(file_path)
+        if lines:
+       
+            nb_drones, parsed_data = parse_syntax(lines)
             print(f" Drones detectados: {nb_drones}")
             print(f" Líneas válidas procesadas: {len(parsed_data)}")
 
-            grapho = models.Graph(nb_drones)
+            grapho = models.Grapho(nb_drones)
 
             #   leo la lista con los componentes y creo objetos
             for data in parsed_data:
@@ -42,6 +43,8 @@ if __name__ == "__main__":
                 else:
                     grapho.add_hub(element)
 
-            grapho.validate_graph()   
-        except ValueError as e:
-            print(e)
+            grapho.validate_graph()
+            print("Graph validated successfully!\n") 
+    except ValueError as e:
+        print(e)
+

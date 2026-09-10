@@ -25,9 +25,9 @@ class EndHub(Hub):
 
 
 class Connection:
-    def __init__(self, conecction_a: str, conecction_b: str, metadata: dict):
-        self.conecction_a: str = conecction_a
-        self.conecction_b: str = conecction_b
+    def __init__(self, zone_a: str, zone_b: str, metadata: dict):
+        self.zone_a: str = zone_a
+        self.zone_b: str = zone_b
         self.max_link_capacity: int = int(metadata.get("max_link_capacity", 1))
 
 
@@ -38,11 +38,9 @@ class Grapho:
         self.hubs: dict[str, Hub] = {}
         self.coordenates: set[tuple[int, int]] = set()
 
-        self.conecctions: list[Connection] = []
+        self.connections: list[Connection] = []
 
-        self.connection_pairs = (
-            set(tuple)
-        )
+        self.connection_pairs: set[tuple[str, str]] = set()
 
         self.start_hub: StartHub | None = None
         self.end_hub: EndHub | None = None
@@ -89,11 +87,10 @@ class Grapho:
         elif isinstance(hub, EndHub):
             if self.end_hub is None:
                 self.end_hub = hub
-                return
             else:
                 raise ValueError("A end_hub already exists")
 
-        self.hubs.append[hub.name] = hub
+        self.hubs[hub.name] = hub
         self.coordenates.add((hub.x, hub.y))
 
     def validate_graph(self) -> None:
@@ -101,3 +98,5 @@ class Grapho:
             raise ValueError("Graph validation failed: Missing StartHub.")
         if self.end_hub is None:
             raise ValueError("Graph validation failed: Missing EndHub.")
+        if len(self.connection_pairs) == 0:
+            raise ValueError("Graph validation falied. Missing connections")

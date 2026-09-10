@@ -8,6 +8,8 @@ def clean_text(file_path: str) -> list[tuple[int, str]]:
                 if line.startswith("#") or not line:
                     continue
                 clean_lines.append((line_num, line))
+        if len(clean_lines) == 0:
+            raise ValueError("The file is empty")
     except (FileNotFoundError, PermissionError) as e:
         print(f"Error opening file {file_path}: {e}")
 
@@ -72,7 +74,7 @@ def parse_middle_part(line: str) -> list[str]:
             )
 
         name = components[0]
-        if " " in name or "-" in name:
+        if any(char in name for char in " -[]"):
             raise ValueError("Hub name cannot contain spaces or dashes")
 
         for coord in components[1:]:
@@ -180,14 +182,14 @@ def parse_syntax(lines: list[tuple[int, str]]) -> tuple[int, list[tuple]]:
     return nb_drones, parsed_elements
 
 
-if __name__ == "__main__":
-    file_path = "maps/easy/02_simple_fork.txt"
+# if __name__ == "__main__":
+#     file_path = "maps/easy/02_simple_fork.txt"
 
-    clean_lines = clean_text(file_path)
-    if clean_lines:
-        try:
-            nb_drones, parsed_data = parse_syntax(clean_lines)
-            print(f"Drones detected: {nb_drones}")
-            print(f"Processed valid lines: {len(parsed_data)}")
-        except ValueError as e:
-            print(e)
+#     clean_lines = clean_text(file_path)
+#     if clean_lines:
+#         try:
+#             nb_drones, parsed_data = parse_syntax(clean_lines)
+#             print(f"Drones detected: {nb_drones}")
+#             print(f"Processed valid lines: {len(parsed_data)}")
+#         except ValueError as e:
+#             print(e)
