@@ -1,7 +1,6 @@
 from parse import clean_text, parse_syntax
 import models  
 
-
 if __name__ == "__main__":
     file_path = "maps/easy/02_simple_fork.txt"
     #   file_path = "maps/easy/01_linear_path.txt"

@@ -127,11 +127,13 @@ def parse_metadata(line: str, prefix: str) -> dict[str, str]:
         return {}
 
     _, _, meta_part = line.partition("[")
-    meta_part = meta_part.rstrip("]").strip()
+    meta,_, extra_things = meta_part.partition("]")
+    if extra_things.strip() != "":
+        raise ValueError ("Text after metadata")
 
     metadata_dict = {}
     seen_keys = set()
-    rest = meta_part
+    rest = meta
 
     while rest:
         if "=" not in rest:

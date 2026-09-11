@@ -25,23 +25,34 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
     empezamos con start y vamso creando rutas : creamos listas nuevas con cada vecino, y cuando un hub tenga de vecino end, lo metemos en la lista
     y lo devolvemos
     """
-    posibol_paths: list[list] = []
-    # first_list = []
-    # first_list.append(start_hub)
-    # posibol_paths.append(first_list)
-    posibol_paths = [[start_hub]]
+    #   Caminos FINALES
+    sorted_final_paths : list[list] = []
+    #   1 generacion
+    first_paths: list[list] = []
+    #   2 generacion
+    second_paths : list[list] = []
+    # para q empiece empezamos con la lista de un solo hub (START)
+    first_paths = [[start_hub]]
+    
 
-    # key, values = neighbors.items()
-    # while end_hub not in values:
-    #     neighbors_names  = neighbors[]
-    for lst in posibol_paths:
-        last_hub = lst[:1]
-        neighbors_names = neighbors[last_hub]
-        for neighbor in neighbors_names:
-            new_list = lst
-            new_list.append(neighbor)
-            if neighbor == end_hub:
-                return new_list
-            posibol_paths.append(new_list)
-        posibol_paths.remove(lst)
+    while len(first_paths) != 0:
+        #limpiamos la segunda ronda anterior
+        second_paths : list[list] = []
+        for lst in first_paths:
+            last_hub = lst[-1]
+            neighbors_names: list = neighbors[last_hub]
+            for neighbor in neighbors_names:
+                if neighbor in lst:
+                    continue
+                new_list = []
+                new_list = lst.copy()
+                new_list.append(neighbor)
+                if neighbor == end_hub:
+                    sorted_final_paths.append(new_list)
+                    continue
+                second_paths.append(new_list)
+        
+        first_paths = second_paths
+        
+    return sorted_final_paths
 
