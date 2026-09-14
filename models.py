@@ -100,3 +100,19 @@ class Grapho:
             raise ValueError("Graph validation failed: Missing EndHub.")
         if len(self.connection_pairs) == 0:
             raise ValueError("Graph validation falied. Missing connections")
+
+
+class Drone():
+    def __init__(self, id: int, route: list[str]):
+        self.id = id
+        self.route = route
+        self.current_step = 0
+        self.wait_time = 0
+
+    @property
+    def current_position(self):
+        return self.route[self.current_step]
+    
+    @property
+    def has_finished(self) -> bool:
+        return self.current_step == len(self.route) - 1

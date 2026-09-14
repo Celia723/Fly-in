@@ -49,7 +49,7 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
                 new_list.append(neighbor)
                 if neighbor == end_hub:
                     sorted_final_paths.append(new_list)
-                    continue
+                    # continue
                 second_paths.append(new_list)
         
         first_paths = second_paths
