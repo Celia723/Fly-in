@@ -20,8 +20,9 @@ def calculate_neighbors(grapho: Grapho) -> dict[str, list]:
     return hubs_and_neighbors
 
 
-def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> list [str]:
+def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> list[list]:
     """
+    crea todos 
     empezamos con start y vamso creando rutas : creamos listas nuevas con cada vecino, y cuando un hub tenga de vecino end, lo metemos en la lista
     y lo devolvemos
     """
@@ -55,4 +56,3 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
         first_paths = second_paths
         
     return sorted_final_paths
-

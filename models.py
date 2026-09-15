@@ -128,4 +128,3 @@ class Drone():
             return None
         self.current_step += 1
 
-    https://profile.intra.42.fr/v3_early_access
