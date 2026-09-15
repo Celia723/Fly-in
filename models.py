@@ -116,3 +116,16 @@ class Drone():
     @property
     def has_finished(self) -> bool:
         return self.current_step == len(self.route) - 1
+
+    @property
+    def next_position(self):
+        if self.has_finished:
+            return None
+        return self.route[self.current_step + 1]
+
+    def move(self):
+        if self.has_finished:
+            return None
+        self.current_step += 1
+
+    https://profile.intra.42.fr/v3_early_access
