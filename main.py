@@ -43,7 +43,7 @@ if __name__ == "__main__":
                     grapho.add_hub(element)
 
             grapho.validate_graph()
-            print("Graph validated successfully!\n") 
+            print("Graph validated successfully!\n")
     except ValueError as e:
         print(e)
 

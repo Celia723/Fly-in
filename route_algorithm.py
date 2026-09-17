@@ -1,4 +1,4 @@
-import Grapho, Drone from models
+from models import Grapho, Drone
 
 
 def calculate_route_cost(route: list[str], graph: Grapho, active_drones: list) -> float:
@@ -39,7 +39,7 @@ def choose_route(routes: list[list], grapho: Grapho, active_drones: list) -> lis
 
     for r in routes:
         cost = calculate_route_cost(r, grapho, active_drones)
-        if cost == None
+        if cost == None:
             continue  #si el coust da NONE es pq tenia un prohibido. Saltamos a la siguiente sin añadirla
         valid_routes.append((cost, r))
     
