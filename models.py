@@ -1,3 +1,6 @@
+from route_algorithm import choose_route
+
+
 class Hub:
 
     def __init__(self, name: str, x: int, y: int, metadata: dict):
@@ -103,7 +106,7 @@ class Grapho:
 
 
 class Drone():
-    def __init__(self, id: int, route: list[str]):
+    def __init__(self, id: int, route: list[str] = None):
         self.id = id
         self.route = route
         self.current_step = 0
@@ -142,24 +145,60 @@ class Simulator():
             self.drones.append(Drone(i))
         
     def run(self):
-        #   hago una lista de todos los drones acivos y las ordeno de mayor a menor
-        active_drones: list[(int, Drone)] = []
-        for d in self.drones:
-            if d.current_step > 0:
-                active_drones.append((d.current_step, d))
-        #   ordenamos
-        active_drones_sort = sorted(active_drones)[::-1]
-        
-        #   cojo los activos y ahora hago q avancen en su ruta
-        #   para eso veo si estan esperando o no, veo si el siguiente tiene espacio y si es asi vemos de q tipo es
-                
-        for da in active_drones_sort:
-            active_drone: Drone = da[1]
-            if active_drone.wait_time > 0:
-                active_drone.wait_time -= 1
-                continue
-            else:
-                nxt_hub = self.grapho.hubs[active_drone.next_position]
-                #ahora q sabes cua es el grapho siguiente tienes q ver si tienes suficente  espacio para entrar y si
-                # restricted o no, para q este dntro y le pongas tiempo de espera
+
+        while any(not d.has_finished for d in self.drones):
+            #   hago una lista de todos los drones acivos y las ordeno de mayor a menor
+            active_drones: list[(int, Drone)] = []       
+            for d in self.drones:
+                if d.current_step > 0 and d.has_finished is False:
+                    active_drones.append((d.current_step, d))
+            #   ordenamos, para ver cual lleva mas pasos dados. para ver mas adeante cual movemos primero
+            active_drones_sort = sorted(active_drones)[::-1]
+            
+            #   cojo los activos y ahora hago q avancen en su ruta
+            #   para eso veo si estan esperando o no, veo si el siguiente tiene espacio y si es asi vemos de q tipo es
+                    
+            for da in active_drones_sort:
+                active_drone: Drone = da[1]
+                if active_drone.wait_time > 0:
+                    active_drone.wait_time -= 1
+                    continue
+                else:
+                    nxt_hub = self.grapho.hubs[active_drone.next_position]
+                    #   ahora q sabes cua es el grapho siguiente tienes q ver si tienes suficente  espacio para entrar y si
+                    # restricted o no, para q este dntro y le pongas tiempo de espera
+                    #    recorremos la lsita de drones activos y vemos cuales estan en el hub
+                    drones_active_in_hub = sum(1 for _, d in active_drones_sort if d.current_hub == nxt_hub)
+
+                    #   si está el siguiente hub petado no avanzo, si hay hueco sigo y veo si es restricted o no , para esperarme
+                    if drones_active_in_hub < nxt_hub.max_drones:
+                        active_drone.current_step += 1
+                        if nxt_hub.zone == "restricted":
+                            active_drone.wait_time += 2
+
+            #   ahora sacamos drones y les asignamos una ruta
+            desactive_drones: list[Drone] = [d for d in self.drones if d.current_step == 0]
+            not_continue = False
+            while not_continue is False:
+                drone = desactive_drones[0]
+                chosen_route = choose_route(self.routes, self.grapho, active_drones)
+                drone.route = chosen_route
+                #   ahora vemos si podemos avanzar, si hay hueco. si vanzanzamos hacemos lo correspondiente
+                if drone.next_position.max_drones  > sum(1 for _, d in active_drones_sort if d.current_hub == drone.name):
+                    drone.current_step += 1
+                    if (self.grapho.hubs[drone.current_step]).zone == "restricted":
+                        drone.wait_time += 2
+                else:
+                    not_continue = True
+                desactive_drones.pop[0]
+
+
+
+
+
+
+            
+
+
+            
 
