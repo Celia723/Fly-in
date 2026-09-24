@@ -166,7 +166,7 @@ def parse_syntax(lines: list[tuple[int, str]]) -> tuple[int, list[tuple]]:
         raise ValueError("Map file is empty")
 
     nb_drones = get_nb_drones(lines[0])
-    parsed_elements = []
+    parsed_elements: list[tuple] = []
 
     for line_num, line_text in lines[1:]:
         if not is_prefix_valid(line_text):

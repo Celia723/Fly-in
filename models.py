@@ -97,6 +97,15 @@ class Grapho:
             raise ValueError("Graph validation failed: Missing EndHub.")
         if len(self.connection_pairs) == 0:
             raise ValueError("Graph validation failed: Missing connections.")
+        connected_hubs = set()
+        for  pair in self.connection_pairs:
+            a, b = pair
+            connected_hubs.add(a)
+            connected_hubs.add(b)
+        
+        for hub in self.hubs:
+            if hub.name not in connected_hubs:
+                raise ValueError(f"Graph validation failed: Hub '{hub.name}' has no connections.")
 
     def get_connection_object(self, h1: str, h2: str) -> Connection | None:
         """Devuelve el objeto Connection entre dos hubs."""
