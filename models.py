@@ -45,6 +45,18 @@ class Grapho:
         self.end_hub: EndHub | None = None
 
         self.neighbors = {}
+    
+    def add_star_hub(self, start_hub: StartHub) -> None:
+        if self.start_hub == None:
+            self.start_hub = start_hub
+        else:
+            raise ValueError("More than one start hub is not allowed")
+
+    def add_end_hub(self, end_hub: EndHub) -> None:
+        if self.end_hub == None:
+            self.end_hub = end_hub
+        else:
+            raise ValueError("More than one end hub is not allowed")
 
     def add_connection(self, connection: Connection) -> None:
         # 1. Comprobar autociclo

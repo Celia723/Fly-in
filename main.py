@@ -39,6 +39,9 @@ if __name__ == "__main__":
                 #   Ahora q tengo el elemento objeto creado lo tengo q meter en grafo
                 if prefix == "connection":
                     grapho.add_connection(element)
+                elif prefix == "start_hub":
+                    grafo.
+                elif prefix == "end_hub":
                 else:
                     grapho.add_hub(element)
 
