@@ -1,5 +1,7 @@
 from parse import clean_text, parse_syntax
-import models  
+import models
+from find_path import total_paths
+
 
 if __name__ == "__main__":
     file_path = "maps/easy/02_simple_fork.txt"
@@ -36,17 +38,33 @@ if __name__ == "__main__":
                     zone_a, zone_b = data[1]
                     element = models.Connection(zone_a, zone_b, data[2])
 
-                #   Ahora q tengo el elemento objeto creado lo tengo q meter en grafo
+                #   Ahora q tengo el elemento objeto creado lo tengo q meter en grafo, me dara error si algo sale mal
                 if prefix == "connection":
                     grapho.add_connection(element)
                 elif prefix == "start_hub":
-                    grafo.
+                    grafo.add_star_hub(element)
                 elif prefix == "end_hub":
+                    grafo.add_end_hub(element)
                 else:
                     grapho.add_hub(element)
-
+            #   ultima validacion (q haya start hub, end y q ningun hub quede suelto)
             grapho.validate_graph()
             print("Graph validated successfully!\n")
+
+            #   ahora que tengo el mapa , tengo q tener las rutas
+            routes = total_paths(grafo)
+            
+            #   ya lo tengo para crear la simulacion
+            simulation = Simulator(grafo, routes, nb_drones)
+            
+            #   creo todos los drones
+            simulation.create_drones()
+
+            #   los voy lanzando (empiezo la simulacion)
+            simulation.run()
+
+            print("La simulacion ha finalizado")
+
     except ValueError as e:
         print(e)
 
