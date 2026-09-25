@@ -45,18 +45,6 @@ class Grapho:
         self.end_hub: EndHub | None = None
 
         self.neighbors = {}
-    
-    def add_star_hub(self, start_hub: StartHub) -> None:
-        if self.start_hub == None:
-            self.start_hub = start_hub
-        else:
-            raise ValueError("More than one start hub is not allowed")
-
-    def add_end_hub(self, end_hub: EndHub) -> None:
-        if self.end_hub == None:
-            self.end_hub = end_hub
-        else:
-            raise ValueError("More than one end hub is not allowed")
 
     def add_connection(self, connection: Connection) -> None:
         # 1. Comprobar autociclo
@@ -84,8 +72,8 @@ class Grapho:
         self.connections.append(connection)
 
     def add_hub(self, hub: Hub) -> None:
-        if hub.name in self.hubs:
-            raise ValueError("The hub already exists")
+        if hub.name in self.hubs.keys():
+            raise ValueError(f"The hub: {hub.name} already exists")
         elif (hub.x, hub.y) in self.coordinates:
             raise ValueError("The coordinates already exist")
         elif isinstance(hub, StartHub):
@@ -115,7 +103,7 @@ class Grapho:
             connected_hubs.add(a)
             connected_hubs.add(b)
         
-        for hub in self.hubs:
+        for _,hub in self.hubs.items():
             if hub.name not in connected_hubs:
                 raise ValueError(f"Graph validation failed: Hub '{hub.name}' has no connections.")
 
@@ -126,6 +114,7 @@ class Grapho:
                 return c
         return None
 
+    #   no se si se usa en algun lugar,  DEBERIA QUITARLO?
     def get_connection_name(self, h1: str, h2: str) -> str:
         """Devuelve el nombre de la conexión (edge) entre dos hubs."""
         c = self.get_connection_object(h1, h2)
@@ -175,7 +164,7 @@ class Simulator:
         for i in range(self.num_drones):
             self.drones.append(Drone(i))
 
-    def _move_active_drones(self, turn_movements: list[str]) -> None:
+    def move_active_drones(self, turn_movements: list[str]) -> None:
         """Procesa el movimiento de todos los drones que ya están volando."""
         active_drones: list[tuple[int, Drone]] = []
         for d in self.drones:
@@ -232,7 +221,7 @@ class Simulator:
                     active_drone.move()
 
 
-    def _spawn_new_drones(self, turn_movements: list[str]) -> None:
+    def spawn_new_drones(self, turn_movements: list[str]) -> None:
         """Intenta despegar drones inactivos (paso 0) según la capacidad disponible."""
         desactive_drones: list[Drone] = [
             d for d in self.drones if d.current_step == 0
@@ -243,43 +232,37 @@ class Simulator:
         ]
         active_drones_sort = sorted(active_drones, reverse=True)
 
-        continue_bring_dron = True
-
-        while continue_bring_dron and len(desactive_drones) > 0:
-            drone = desactive_drones.pop(0)
+        while len(desactive_drones) > 0:
+            drone = desactive_drones[0]
             chosen_route = choose_route(self.routes, self.grapho, active_drones)
 
-            start_hub_name = chosen_route[0]
-            first_hub_name = chosen_route[1]
-            nxt_hub = self.grapho.hubs[first_hub_name]
-
-            # 1. Comprobar primero si el Hub destino tiene sitio
-            drones_in_nxt = sum(
-                1 for _, d in active_drones_sort if d.current_position == nxt_hub.name
-            )
-
-            if drones_in_nxt >= nxt_hub.max_drones:
-                continue_bring_dron = False
+            if chosen_route == None:
                 break
+            drone = desactive_drones.pop(0)
+            drone.route = chosen_route
+            start_hub_name = chosen_route[0]
+            nxt_hub = self.grapho.hubs[drone.next_position]
 
-            # 2. Si el hub destino es RESTRICTED, recién ahí calculamos la conexión y validamos su límite
+            # 1. Si el hub destino es RESTRICTED, recién ahí calculamos la conexión y validamos su límite
+           # 1. Si el hub destino es RESTRICTED
             if nxt_hub.zone == "restricted":
-                conn_obj = self.grapho.get_connection_object(start_hub_name, first_hub_name)
-                conn_name = self.grapho.get_connection_name(start_hub_name, first_hub_name)
-                drones_using_link = sum(1 for m in turn_movements if conn_name in m)
-
-                if drones_using_link < conn_obj.max_link_capacity:
-                    drone.route = chosen_route
+                if drone.time_in_conexion == 0:
+                    # Primer turno: volando hacia la zona restringida -> Imprimimos la CONEXIÓN
                     drone.time_in_conexion = 1
                     drone.wait_time = 1
-                    drone.move()
+                    
+                    # Obtenemos el nombre de la conexión
+                    conn_name = f"{drone.current_position}-{nxt_hub.name}"
                     turn_movements.append(f"D{drone.id}-{conn_name}")
-                else:
-                    continue_bring_dron = False
 
-            # 3. Si es un Hub NORMAL o PRIORITY, despega directo
+                elif drone.time_in_conexion == 1:
+                    # Segundo turno: aterriza en la zona restringida -> Imprimimos la ZONA
+                    drone.time_in_conexion = 0
+                    drone.move()
+                    turn_movements.append(f"D{drone.id}-{nxt_hub.name}")
+
+            # 2. Si es un Hub NORMAL o PRIORITY, despega e imprime directo a la ZONA
             else:
-                drone.route = chosen_route
                 drone.move()
                 turn_movements.append(f"D{drone.id}-{nxt_hub.name}")
 
@@ -290,10 +273,10 @@ class Simulator:
             turn_movements: list[str] = []
 
             # Step 1: Mover activos primero
-            self._move_active_drones(turn_movements)
+            self.move_active_drones(turn_movements)
 
             # Step 2: Despegar nuevos drones en los huecos restantes
-            self._spawn_new_drones(turn_movements)
+            self.spawn_new_drones(turn_movements)
 
             # Step 3: Mostrar los movimientos del turno
             if turn_movements:

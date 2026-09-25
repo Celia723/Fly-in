@@ -1,7 +1,7 @@
-from models import Grapho, Hub
+#   from models import Grapho, Hub
 
 
-def calculate_neighbors(grapho: Grapho) -> dict[str, list]:
+def calculate_neighbors(grapho: "Grapho") -> dict[str, list]:
     hubs_and_neighbors: dict[str, list] = {}
     conecctions = grapho.connection_pairs
 
@@ -49,16 +49,16 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
                 new_list.append(neighbor)
                 if neighbor == end_hub:
                     sorted_final_paths.append(new_list)
-                    # continue
+                    continue
                 second_paths.append(new_list)
 
         first_paths = second_paths
 
     return sorted_final_paths
 
-def total_paths(grapho: Grapho) -> list:
+def total_paths(grapho: "Grapho") -> list:
     neighbors = calculate_neighbors(grapho)
-    paths = find_path(neighbors, grapho.start_hub, grafo.end_hub)
+    paths = path_finder(neighbors, grapho.start_hub.name, grapho.end_hub)
 
     return paths
 
