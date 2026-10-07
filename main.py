@@ -48,9 +48,10 @@ if __name__ == "__main__":
 
             # Cálculo de rutas
             routes = total_paths(grapho)
-            
+            print(f"Rutas encontradas: {routes}\n")
             # Instancia e inicio de la simulación
             simulation = models.Simulator(grapho, routes, nb_drones)
+            print("Hola")
             simulation.create_drones()
             simulation.run()
 

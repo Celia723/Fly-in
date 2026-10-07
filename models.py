@@ -152,6 +152,7 @@ class Drone:
             return None
         self.current_step += 1
 
+
 class Simulator:
     def __init__(self, grapho: Grapho, routes: list[list], num_drones: int):
         self.grapho: Grapho = grapho
@@ -272,12 +273,12 @@ class Simulator:
             self.turn += 1
             turn_movements: list[str] = []
 
-            # Step 1: Mover activos primero
+            # 1. Mover activos primero
             self.move_active_drones(turn_movements)
 
-            # Step 2: Despegar nuevos drones en los huecos restantes
+            # 2. Despegar inactivos
             self.spawn_new_drones(turn_movements)
 
-            # Step 3: Mostrar los movimientos del turno
+            # 3. Imprimir el turno
             if turn_movements:
                 print(" ".join(turn_movements))
