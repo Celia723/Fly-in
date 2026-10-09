@@ -227,15 +227,16 @@ class Simulator:
         desactive_drones: list[Drone] = [
             d for d in self.drones if d.current_step == 0
         ]
-        
-        active_drones = [
-            (d.current_step, d) for d in self.drones if d.current_step > 0 and not d.has_finished
-        ]
-        active_drones_sort = sorted(active_drones, key=lambda x: x[0], reverse=True)
 
         while len(desactive_drones) > 0:
+            
             drone = desactive_drones[0]
-            chosen_route = choose_route(self.routes, self.grapho, active_drones_sort)
+            active_drones = [
+                        (d.current_step, d) for d in self.drones if d.current_step > 0 and not d.has_finished
+                    ]
+            active_drones_sort = sorted(active_drones, key=lambda x: x[0], reverse=True)
+            active_objects_drones_sort = [d for step, d in active_drones_sort]
+            chosen_route = choose_route(self.routes, self.grapho, active_objects_drones_sort)
 
             if chosen_route is None:
                 break
