@@ -56,9 +56,11 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
 
     return sorted_final_paths
 
+
 def total_paths(grapho: "Grapho") -> list:
     neighbors = calculate_neighbors(grapho)
-    paths = path_finder(neighbors, grapho.start_hub.name, grapho.end_hub)
-
+    print("VECINOS CALCULADOS:", neighbors)  # 👈 Pon esto
+    print("START HUB:", grapho.start_hub.name)
+    print("END HUB:", grapho.end_hub.name)
+    paths = path_finder(neighbors, grapho.start_hub.name, grapho.end_hub.name)
     return paths
-

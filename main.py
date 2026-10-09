@@ -42,7 +42,7 @@ if __name__ == "__main__":
                     grapho.add_hub(element)
                 
  
-            # Última validación (start, end y hubs conectados)
+            #   Última validación (start, end y hubs conectados)
             grapho.validate_graph()
             print("Graph validated successfully!\n")
 
