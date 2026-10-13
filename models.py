@@ -44,7 +44,7 @@ class Grapho:
         self.start_hub: StartHub | None = None
         self.end_hub: EndHub | None = None
 
-        self.neighbors = {}
+        self.neighbors: dict[str, list[str]] = {}
 
     def add_connection(self, connection: Connection) -> None:
 
@@ -126,7 +126,7 @@ class Grapho:
 
 
 class Drone:
-    def __init__(self, id: int, route: list[str] = None):
+    def __init__(self, id: int, route: list[str] | None = None):
         self.id = id
         self.route = route
         self.current_step = 0
@@ -187,7 +187,12 @@ class Simulator:
                 active_drone.wait_time -= 1
                 continue
 
-            nxt_hub = self.grapho.hubs[active_drone.next_position]
+            current_position = active_drone.current_position
+            next_position = active_drone.next_position
+            if current_position is None or next_position is None:
+                continue
+
+            nxt_hub = self.grapho.hubs[next_position]
             drones_active_in_hub = sum(
                 1 for _, d in active_drones_sort
                 if d.current_position == nxt_hub.name
@@ -201,10 +206,12 @@ class Simulator:
                     continue
 
                 conn_obj = self.grapho.get_connection_object(
-                    active_drone.current_position, nxt_hub.name
+                    current_position, nxt_hub.name
                 )
+                if conn_obj is None:
+                    continue
                 conn_name = self.grapho.get_connection_name(
-                    active_drone.current_position, nxt_hub.name
+                    current_position, nxt_hub.name
                 )
                 drones_using_link = sum(
                     1 for m in turn_movements if conn_name in m)
@@ -243,7 +250,10 @@ class Simulator:
                 break
             drone = desactive_drones.pop(0)
             drone.route = chosen_route
-            nxt_hub = self.grapho.hubs[drone.next_position]
+            next_position = drone.next_position
+            if next_position is None:
+                continue
+            nxt_hub = self.grapho.hubs[next_position]
 
             if nxt_hub.zone == "restricted":
                 if drone.time_in_conexion == 0:

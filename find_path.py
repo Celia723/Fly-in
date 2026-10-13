@@ -32,8 +32,6 @@ def path_finder(
     sorted_final_paths: list[list] = []
     #   1 generacion
     first_paths: list[list] = []
-    #   2 generacion
-    second_paths: list[list] = []
     # para q empiece empezamos con la lista de un solo hub (START)
     first_paths = [[start_hub]]
 
@@ -60,6 +58,9 @@ def path_finder(
 
 
 def total_paths(grapho: "Grapho") -> list:
+    if grapho.start_hub is None or grapho.end_hub is None:
+        return []
+
     neighbors = calculate_neighbors(grapho)
     paths = path_finder(neighbors, grapho.start_hub.name, grapho.end_hub.name)
     return paths

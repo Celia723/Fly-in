@@ -28,21 +28,24 @@ if __name__ == "__main__":
 
                 if prefix == "start_hub":
                     name, x, y = data[1]
-                    element = models.StartHub(name, int(x), int(y), data[2])
+                    grapho.add_hub(
+                        models.StartHub(name, int(x), int(y), data[2])
+                    )
                 elif prefix == "end_hub":
                     name, x, y = data[1]
-                    element = models.EndHub(name, int(x), int(y), data[2])
+                    grapho.add_hub(
+                        models.EndHub(name, int(x), int(y), data[2])
+                    )
                 elif prefix == "hub":
                     name, x, y = data[1]
-                    element = models.Hub(name, int(x), int(y), data[2])
+                    grapho.add_hub(
+                        models.Hub(name, int(x), int(y), data[2])
+                    )
                 elif prefix == "connection":
                     zone_a, zone_b = data[1]
-                    element = models.Connection(zone_a, zone_b, data[2])
-                # Ahora que tengo el objeto creado lo añado al grafo
-                if prefix == "connection":
-                    grapho.add_connection(element)
-                elif prefix in ("start_hub", "end_hub", "hub"):
-                    grapho.add_hub(element)
+                    grapho.add_connection(
+                        models.Connection(zone_a, zone_b, data[2])
+                    )
 
             #   Última validación (start, end y hubs conectados)
             grapho.validate_graph()
