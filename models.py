@@ -9,7 +9,7 @@ class Hub:
 
         self.color: str | None = metadata.get("color", None)
         self.zone: str = metadata.get("zone", "normal")
-        self.max_drones: int = int(metadata.get("max_drones", 1))
+        self.max_drones: int | float = int(metadata.get("max_drones", 1))
 
 
 class StartHub(Hub):
@@ -47,27 +47,26 @@ class Grapho:
         self.neighbors = {}
 
     def add_connection(self, connection: Connection) -> None:
-        # 1. Comprobar autociclo
+
         if connection.zone_a == connection.zone_b:
             raise ValueError("A connection cannot link a hub to itself")
 
-        # 2. Comprobar que ambos hubs existen en el grafo
-        if connection.zone_a not in self.hubs or connection.zone_b not in self.hubs:
+        if (
+            connection.zone_a not in self.hubs
+            or connection.zone_b not in self.hubs
+        ):
             raise ValueError("Connection requires hubs that do not exist")
 
-        # 3. Ordenar los nombres alfabéticamente para normalizar la dirección
         if connection.zone_a > connection.zone_b:
             connection.zone_a, connection.zone_b = (
                 connection.zone_b,
                 connection.zone_a,
             )
 
-        # 4. Comprobar si ya existe la tupla ordenada en nuestro set de control
         pair = (connection.zone_a, connection.zone_b)
         if pair in self.connection_pairs:
             raise ValueError("The connection already exists")
 
-        # 5. Guardar en ambas estructuras
         self.connection_pairs.add(pair)
         self.connections.append(connection)
 
@@ -98,23 +97,28 @@ class Grapho:
         if len(self.connection_pairs) == 0:
             raise ValueError("Graph validation failed: Missing connections.")
         connected_hubs = set()
-        for  pair in self.connection_pairs:
+        for pair in self.connection_pairs:
             a, b = pair
             connected_hubs.add(a)
             connected_hubs.add(b)
-        
-        for _,hub in self.hubs.items():
+
+        for _, hub in self.hubs.items():
             if hub.name not in connected_hubs:
-                raise ValueError(f"Graph validation failed: Hub '{hub.name}' has no connections.")
+                raise ValueError(
+                    f"Graph validation failed: Hub '{hub.name}'"
+                      "has no connections.")
 
     def get_connection_object(self, h1: str, h2: str) -> Connection | None:
         """Devuelve el objeto Connection entre dos hubs."""
         for c in self.connections:
-            if (c.zone_a == h1 and c.zone_b == h2) or (c.zone_a == h2 and c.zone_b == h1):
+            if (
+                (c.zone_a == h1 and c.zone_b == h2)
+                or
+                (c.zone_a == h2 and c.zone_b == h1)
+            ):
                 return c
         return None
 
-    #   no se si se usa en algun lugar,  DEBERIA QUITARLO?
     def get_connection_name(self, h1: str, h2: str) -> str:
         """Devuelve el nombre de la conexión (edge) entre dos hubs."""
         c = self.get_connection_object(h1, h2)
@@ -163,49 +167,47 @@ class Simulator:
 
     def create_drones(self):
         for i in range(self.num_drones):
-            self.drones.append(Drone(i))
+            self.drones.append(Drone(i + 1))
 
     def move_active_drones(self, turn_movements: list[str]) -> None:
-        """Procesa el movimiento de todos los drones que ya están volando."""
+
         active_drones: list[tuple[int, Drone]] = []
         for d in self.drones:
             if d.current_step > 0 and not d.has_finished:
                 active_drones.append((d.current_step, d))
 
-        # Ordenar de mayor a menor avance en la ruta (cogemos lo primero de la tupla q son los pasos)
-        active_drones_sort = sorted(active_drones, key=lambda x: x[0], reverse= True)
+        active_drones_sort = sorted(
+            active_drones, key=lambda x: x[0], reverse=True)
 
         for da in active_drones_sort:
+
             active_drone: Drone = da[1]
 
-            # 1. Reducir tiempo de espera si está congelado/volando
             if active_drone.wait_time > 0:
                 active_drone.wait_time -= 1
                 continue
 
-            # 2. Calcular ocupación actual del hub destino
             nxt_hub = self.grapho.hubs[active_drone.next_position]
             drones_active_in_hub = sum(
-                1 for _, d in active_drones_sort if d.current_position == nxt_hub.name
+                1 for _, d in active_drones_sort
+                if d.current_position == nxt_hub.name
             )
 
-            # OPCIÓN A: El siguiente hub es RESTRICTED
             if nxt_hub.zone == "restricted":
-                # A1: Ya estaba volando en la conexión -> Aterriza
                 if active_drone.time_in_conexion == 1:
                     active_drone.time_in_conexion = 0
                     active_drone.move()
                     turn_movements.append(f"D{active_drone.id}-{nxt_hub.name}")
                     continue
 
-                # A2: Entra a la conexión por primera vez
                 conn_obj = self.grapho.get_connection_object(
                     active_drone.current_position, nxt_hub.name
                 )
                 conn_name = self.grapho.get_connection_name(
                     active_drone.current_position, nxt_hub.name
                 )
-                drones_using_link = sum(1 for m in turn_movements if conn_name in m)
+                drones_using_link = sum(
+                    1 for m in turn_movements if conn_name in m)
 
                 if (
                     drones_active_in_hub < nxt_hub.max_drones
@@ -215,55 +217,46 @@ class Simulator:
                     active_drone.wait_time = 1
                     turn_movements.append(f"D{active_drone.id}-{conn_name}")
 
-            # OPCIÓN B: El siguiente hub es NORMAL / PRIORITY
             else:
                 if drones_active_in_hub < nxt_hub.max_drones:
                     turn_movements.append(f"D{active_drone.id}-{nxt_hub.name}")
                     active_drone.move()
 
-
     def spawn_new_drones(self, turn_movements: list[str]) -> None:
-        """Intenta despegar drones inactivos (paso 0) según la capacidad disponible."""
         desactive_drones: list[Drone] = [
             d for d in self.drones if d.current_step == 0
         ]
 
         while len(desactive_drones) > 0:
-            
             drone = desactive_drones[0]
             active_drones = [
-                        (d.current_step, d) for d in self.drones if d.current_step > 0 and not d.has_finished
+                        (d.current_step, d) for d in self.drones
+                        if d.current_step > 0 and not d.has_finished
                     ]
-            active_drones_sort = sorted(active_drones, key=lambda x: x[0], reverse=True)
+            active_drones_sort = sorted(
+                active_drones, key=lambda x: x[0], reverse=True)
             active_objects_drones_sort = [d for step, d in active_drones_sort]
-            chosen_route = choose_route(self.routes, self.grapho, active_objects_drones_sort)
+            chosen_route = choose_route(
+                self.routes, self.grapho, active_objects_drones_sort)
 
             if chosen_route is None:
                 break
             drone = desactive_drones.pop(0)
             drone.route = chosen_route
-            start_hub_name = chosen_route[0]
             nxt_hub = self.grapho.hubs[drone.next_position]
 
-            # 1. Si el hub destino es RESTRICTED, recién ahí calculamos la conexión y validamos su límite
-           # 1. Si el hub destino es RESTRICTED
             if nxt_hub.zone == "restricted":
                 if drone.time_in_conexion == 0:
-                    # Primer turno: volando hacia la zona restringida -> Imprimimos la CONEXIÓN
                     drone.time_in_conexion = 1
                     drone.wait_time = 1
-                    
-                    # Obtenemos el nombre de la conexión
                     conn_name = f"{drone.current_position}-{nxt_hub.name}"
                     turn_movements.append(f"D{drone.id}-{conn_name}")
 
                 elif drone.time_in_conexion == 1:
-                    # Segundo turno: aterriza en la zona restringida -> Imprimimos la ZONA
                     drone.time_in_conexion = 0
                     drone.move()
                     turn_movements.append(f"D{drone.id}-{nxt_hub.name}")
 
-            # 2. Si es un Hub NORMAL o PRIORITY, despega e imprime directo a la ZONA
             else:
                 drone.move()
                 turn_movements.append(f"D{drone.id}-{nxt_hub.name}")
@@ -274,12 +267,9 @@ class Simulator:
             self.turn += 1
             turn_movements: list[str] = []
 
-            # 1. Mover activos primero
             self.move_active_drones(turn_movements)
 
-            # 2. Despegar inactivos
             self.spawn_new_drones(turn_movements)
 
-            # 3. Imprimir el turno
             if turn_movements:
                 print(" ".join(turn_movements))

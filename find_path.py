@@ -1,4 +1,7 @@
-#   from models import Grapho, Hub
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from models import Grapho
 
 
 def calculate_neighbors(grapho: "Grapho") -> dict[str, list]:
@@ -20,12 +23,11 @@ def calculate_neighbors(grapho: "Grapho") -> dict[str, list]:
     return hubs_and_neighbors
 
 
-def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> list[list]:
-    """
-    crea todos 
-    empezamos con start y vamso creando rutas : creamos listas nuevas con cada vecino, y cuando un hub tenga de vecino end, lo metemos en la lista
-    y lo devolvemos
-    """
+def path_finder(
+        neighbors: dict[str, list],
+        start_hub: str,
+        end_hub: str) -> list[list]:
+
     #   Caminos FINALES
     sorted_final_paths: list[list] = []
     #   1 generacion
@@ -59,8 +61,5 @@ def path_finder(neighbors: dict[str, list], start_hub: str, end_hub: str) -> lis
 
 def total_paths(grapho: "Grapho") -> list:
     neighbors = calculate_neighbors(grapho)
-    print("VECINOS CALCULADOS:", neighbors)  # 👈 Pon esto
-    print("START HUB:", grapho.start_hub.name)
-    print("END HUB:", grapho.end_hub.name)
     paths = path_finder(neighbors, grapho.start_hub.name, grapho.end_hub.name)
     return paths

@@ -127,9 +127,9 @@ def parse_metadata(line: str, prefix: str) -> dict[str, str]:
         return {}
 
     _, _, meta_part = line.partition("[")
-    meta,_, extra_things = meta_part.partition("]")
+    meta, _, extra_things = meta_part.partition("]")
     if extra_things.strip() != "":
-        raise ValueError ("Text after metadata")
+        raise ValueError("Text after metadata")
 
     metadata_dict = {}
     seen_keys = set()
@@ -182,16 +182,3 @@ def parse_syntax(lines: list[tuple[int, str]]) -> tuple[int, list[tuple]]:
             raise ValueError(f"Syntax error at line {line_num}: {e}")
 
     return nb_drones, parsed_elements
-
-
-# if __name__ == "__main__":
-#     file_path = "maps/easy/02_simple_fork.txt"
-
-#     clean_lines = clean_text(file_path)
-#     if clean_lines:
-#         try:
-#             nb_drones, parsed_data = parse_syntax(clean_lines)
-#             print(f"Drones detected: {nb_drones}")
-#             print(f"Processed valid lines: {len(parsed_data)}")
-#         except ValueError as e:
-#             print(e)

@@ -9,7 +9,10 @@ if __name__ == "__main__":
     #   file_path = "maps/medium/01_dead_end_trap.txt"
     #   file_path = "maps/medium/02_circular_loop.txt"
     #   file_path = "maps/medium/03_priority_puzzle.txt"
-
+    #   file_path = "maps/hard/01_maze_nightmare.txt"
+    #   file_path = "maps/hard/02_capacity_hell.txt"
+    #   file_path = "maps/hard/03_ultimate_challenge.txt"
+    #   file_path = "maps/challenger/01_the_impossible_dream.txt"
     try:
         lines = clean_text(file_path)
         if lines:
@@ -40,15 +43,13 @@ if __name__ == "__main__":
                     grapho.add_connection(element)
                 elif prefix in ("start_hub", "end_hub", "hub"):
                     grapho.add_hub(element)
-                
- 
+
             #   Última validación (start, end y hubs conectados)
             grapho.validate_graph()
             print("Graph validated successfully!\n")
 
             # Cálculo de rutas
             routes = total_paths(grapho)
-            print(f"Rutas encontradas: {routes}\n")
             # Instancia e inicio de la simulación
             simulation = models.Simulator(grapho, routes, nb_drones)
             print("Hola")
@@ -59,4 +60,3 @@ if __name__ == "__main__":
 
     except ValueError as e:
         print(e)
-
