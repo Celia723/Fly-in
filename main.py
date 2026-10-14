@@ -1,7 +1,9 @@
 from parse import clean_text, parse_syntax
 import models
 from find_path import total_paths
-
+"""import colorama
+colorama.init()  # Esto activa los colores mágicamente en Windows
+"""
 if __name__ == "__main__":
     file_path = "maps/easy/02_simple_fork.txt"
     #   file_path = "maps/easy/01_linear_path.txt"

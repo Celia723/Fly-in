@@ -273,13 +273,53 @@ class Simulator:
 
     def run(self):
         """Bucle principal de la simulación."""
+        # 1. El bucle se repite mientras QUEDE AL MENOS UN DRón que NO haya terminado.
         while any(not d.has_finished for d in self.drones):
             self.turn += 1
             turn_movements: list[str] = []
 
+            # 2. Se mueven los drones activos y los nuevos, guardando sus textos 
+            # (ej: "D1-roof1") en la lista turn_movements.
             self.move_active_drones(turn_movements)
-
             self.spawn_new_drones(turn_movements)
 
+            COLOR_MAP = {
+                "red": "\033[91m",
+                "green": "\033[92m",
+                "blue": "\033[94m",
+                "yellow": "\033[93m",
+                "gray": "\033[90m",
+                "cyan": "\033[36m",
+                "magenta": "\033[35m",
+            }
+
+            RESET_COLOR = "\033[0m"
+            # 3. Si en este turno hay algún movimiento que imprimir:
             if turn_movements:
-                print(" ".join(turn_movements))
+                colored_movements = []
+                
+                # RECORREMOS CADA MOVIMIENTO DE LA LISTA
+                for m in turn_movements:
+                    # 'm' es un texto como "D1-roof1" o "D2-tunnelB"
+                    
+                    # A) Separamos por el guion para sacar el destino
+                    parts = m.split("-")
+                    destination = parts[1] if len(parts) > 1 else ""
+                    
+                    # B) Buscamos la zona (el hub) en el grafo de tu mapa
+                    zone_color = "none"
+                    if destination in self.grapho.hubs:
+                        # Extraemos el color de los metadatos del mapa ([color=red], etc.)
+                        zone_color = self.grapho.hubs[destination].color
+                    # C) Traducimos el nombre del color ("red", "green"...) al código ANSI de la terminal
+                    ansi_code = COLOR_MAP.get(zone_color.lower(), "")
+                    
+                    # D) Si tiene color, envolvemos el texto con el código y el RESET_COLOR al final
+                    if ansi_code:
+                        colored_movements.append(f"{ansi_code}{m}{RESET_COLOR}")
+                    else:
+                        # Si no tiene color definido, se queda con el texto normal
+                        colored_movements.append(m)
+
+                # 4. Imprimimos todos los movimientos del turno separados por espacios
+                print(" ".join(colored_movements))
