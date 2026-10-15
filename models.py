@@ -326,11 +326,11 @@ class Simulator:
 
                 # 2. Si el flag --capacity-info está activo, imprimimos la extra
                 if self.capacity_info_enabled:
-                    extra_text = imprimir_extra(hubs_turno, self.grapho, self)
+                    extra_text = imprimir_extra(hubs_turno, self)
                     print(extra_text)
 
 
-def imprimir_extra(hubs: list[Hub], graph: Grapho, simulator: Simulator) -> str:
+def imprimir_extra(hubs: list[Hub], simulator: Simulator) -> str:
     active_drones = [
         d for d in simulator.drones 
         if d.current_step > 0 and not d.has_finished
