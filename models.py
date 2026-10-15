@@ -122,6 +122,8 @@ class Grapho:
     def get_connection_name(self, h1: str, h2: str) -> str:
         """Devuelve el nombre de la conexión (edge) entre dos hubs."""
         c = self.get_connection_object(h1, h2)
+        if not c:
+            return None
         return f"{c.zone_a}-{c.zone_b}" if c else ""
 
 
@@ -158,12 +160,13 @@ class Drone:
 
 
 class Simulator:
-    def __init__(self, grapho: Grapho, routes: list[list], num_drones: int):
+    def __init__(self, grapho: Grapho, routes: list[list], num_drones: int, capacity_info_enabled: bool):
         self.grapho: Grapho = grapho
         self.drones: list[Drone] = []
         self.num_drones: int = num_drones
         self.routes: list[list] = routes
         self.turn: int = 0
+        self.capacity_info_enabled: bool = capacity_info_enabled
 
     def create_drones(self) -> None:
         for i in range(self.num_drones):
@@ -300,6 +303,7 @@ class Simulator:
 
             if turn_movements:
                 colored_movements = []
+                hubs_turno = []
                 for m in turn_movements:
                     #   "D1-roof1" o "D2-tunnelB"
                     parts = m.split("-")
@@ -307,6 +311,7 @@ class Simulator:
                     zone_color: str = "none"
                     if destination in self.grapho.hubs:
                         hub = self.grapho.hubs[destination]
+                        hubs_turno.append(hub)
                         zone_color = hub.color or "none"
                     ansi_code = COLOR_MAP.get(zone_color.lower(), "")
 
@@ -316,4 +321,29 @@ class Simulator:
                     else:
                         colored_movements.append(m)
 
+                  # 1. Imprimimos los movimientos del turno juntos
                 print(" ".join(colored_movements))
+
+                # 2. Si el flag --capacity-info está activo, imprimimos la extra
+                if self.capacity_info_enabled:
+                    extra_text = imprimir_extra(hubs_turno, self.grapho, self)
+                    print(extra_text)
+
+
+def imprimir_extra(hubs: list[Hub], graph: Grapho, simulator: Simulator) -> str:
+    active_drones = [
+        d for d in simulator.drones 
+        if d.current_step > 0 and not d.has_finished
+    ]
+    
+    parts = []
+    for hub in hubs:
+        drones_in_hub = sum(
+            1 for d in active_drones if d.current_position == hub.name
+        )
+        max_cap = hub.max_drones
+        parts.append(f"Zone {hub.name}: {drones_in_hub}/{max_cap} drones")
+
+    return ", ".join(parts)
+
+

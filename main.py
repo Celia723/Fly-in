@@ -1,6 +1,8 @@
 from parse import clean_text, parse_syntax
 import models
 from find_path import total_paths
+import sys
+
 """import colorama
 colorama.init()  # Esto activa los colores mágicamente en Windows
 """
@@ -53,7 +55,10 @@ if __name__ == "__main__":
 
             routes = total_paths(grapho)
 
-            simulation = models.Simulator(grapho, routes, nb_drones)
+            # Comprobamos directamente si el flag está en los argumentos de la terminal
+            capacity_info_enabled = "--capacity-info" in sys.argv
+
+            simulation = models.Simulator(grapho, routes, nb_drones, capacity_info_enabled)
             simulation.create_drones()
             simulation.run()
 
