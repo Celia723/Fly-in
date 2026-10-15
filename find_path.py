@@ -28,15 +28,13 @@ def path_finder(
         start_hub: str,
         end_hub: str) -> list[list]:
 
-    #   Caminos FINALES
     sorted_final_paths: list[list] = []
-    #   1 generacion
+
     first_paths: list[list] = []
-    # para q empiece empezamos con la lista de un solo hub (START)
+
     first_paths = [[start_hub]]
 
     while len(first_paths) != 0:
-        #   limpiamos la segunda ronda anterior
         second_paths: list[list] = []
         for lst in first_paths:
             last_hub = lst[-1]

@@ -122,16 +122,16 @@ The simulation ends when all drones have reached the end hub.
  
 | Map                      | Drones | Target | Obtained |
 |--------------------------|--------|--------|----------|
-| Linear path              | 2      | ≤ 6    |          |
-| Simple fork              | 4      | ≤ 8    |          |
-| Basic capacity           | 4      | ≤ 6    |          |
-| Dead end trap            | 5      | ≤ 12   |          |
-| Circular loop            | 6      | ≤ 15   |          |
-| Priority puzzle          | 5      | ≤ 12   |          |
-| Maze nightmare           | 8      | ≤ 30   |          |
-| Capacity hell            | 12     | ≤ 35   |          |
-| Ultimate challenge       | 15     | ≤ 45   |          |
-| The Impossible Dream (*) | 25     | 45     |          |
+| Linear path              | 2      | ≤ 6    |    5     |
+| Simple fork              | 4      | ≤ 8    |    6     |
+| Basic capacity           | 4      | ≤ 6    |    3     |
+| Dead end trap            | 5      | ≤ 12   |    12    |
+| Circular loop            | 6      | ≤ 15   |    19    |
+| Priority puzzle          | 5      | ≤ 12   |    9     |
+| Maze nightmare           | 8      | ≤ 30   |    13    |
+| Capacity hell            | 12     | ≤ 35   |    10    |
+| Ultimate challenge       | 15     | ≤ 45   |    33    |
+| The Impossible Dream (*) | 25     | 45     |    144   |
  
 (*) Optional challenger map.
  

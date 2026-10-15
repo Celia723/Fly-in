@@ -5,8 +5,8 @@ from find_path import total_paths
 colorama.init()  # Esto activa los colores mágicamente en Windows
 """
 if __name__ == "__main__":
-    file_path = "maps/easy/02_simple_fork.txt"
     #   file_path = "maps/easy/01_linear_path.txt"
+    file_path = "maps/easy/02_simple_fork.txt"
     #   file_path = "maps/easy/03_basic_capacity.txt"
     #   file_path = "maps/medium/01_dead_end_trap.txt"
     #   file_path = "maps/medium/02_circular_loop.txt"
@@ -24,7 +24,6 @@ if __name__ == "__main__":
 
             grapho = models.Grapho(nb_drones)
 
-            # Leo la lista con los componentes y creo objetos
             for data in parsed_data:
                 prefix = data[0]
 
@@ -49,15 +48,12 @@ if __name__ == "__main__":
                         models.Connection(zone_a, zone_b, data[2])
                     )
 
-            #   Última validación (start, end y hubs conectados)
             grapho.validate_graph()
             print("Graph validated successfully!\n")
 
-            # Cálculo de rutas
             routes = total_paths(grapho)
-            # Instancia e inicio de la simulación
+
             simulation = models.Simulator(grapho, routes, nb_drones)
-            print("Hola")
             simulation.create_drones()
             simulation.run()
 

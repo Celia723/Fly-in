@@ -15,13 +15,13 @@ class Hub:
 class StartHub(Hub):
     def __init__(self, name: str, x: int, y: int, metadata: dict):
         super().__init__(name, x, y, metadata)
-        self.max_drones: float = float("inf")  # Capacidad infinita
+        self.max_drones: float = float("inf")  # infinity capacity
 
 
 class EndHub(Hub):
     def __init__(self, name: str, x: int, y: int, metadata: dict):
         super().__init__(name, x, y, metadata)
-        self.max_drones: float = float("inf")  # Capacidad infinita
+        self.max_drones: float = float("inf")  # inifinity cap
 
 
 class Connection:
@@ -151,9 +151,9 @@ class Drone:
             return None
         return self.route[self.current_step + 1]
 
-    def move(self):
+    def move(self) -> None:
         if self.has_finished:
-            return None
+            return
         self.current_step += 1
 
 
@@ -165,7 +165,7 @@ class Simulator:
         self.routes: list[list] = routes
         self.turn: int = 0
 
-    def create_drones(self):
+    def create_drones(self) -> None:
         for i in range(self.num_drones):
             self.drones.append(Drone(i + 1))
 
@@ -271,15 +271,10 @@ class Simulator:
                 drone.move()
                 turn_movements.append(f"D{drone.id}-{nxt_hub.name}")
 
-    def run(self):
-        """Bucle principal de la simulación."""
-        # 1. El bucle se repite mientras QUEDE AL MENOS UN DRón que NO haya terminado.
+    def run(self) -> None:
         while any(not d.has_finished for d in self.drones):
             self.turn += 1
             turn_movements: list[str] = []
-
-            # 2. Se mueven los drones activos y los nuevos, guardando sus textos 
-            # (ej: "D1-roof1") en la lista turn_movements.
             self.move_active_drones(turn_movements)
             self.spawn_new_drones(turn_movements)
 
@@ -291,35 +286,34 @@ class Simulator:
                 "gray": "\033[90m",
                 "cyan": "\033[36m",
                 "magenta": "\033[35m",
+                "purple": "\033[35m",
+                "black": "\033[30m",
+                "brown": "\033[38;5;130m",
+                "orange": "\033[38;5;208m",
+                "maroon": "\033[38;5;88m",
+                "gold": "\033[38;5;220m",
+                "darkred": "\033[38;5;52m",
+                "crimson": "\033[38;5;161m",
+                "rainbow": "\033[95m"
             }
-
             RESET_COLOR = "\033[0m"
-            # 3. Si en este turno hay algún movimiento que imprimir:
+
             if turn_movements:
                 colored_movements = []
-                
-                # RECORREMOS CADA MOVIMIENTO DE LA LISTA
                 for m in turn_movements:
-                    # 'm' es un texto como "D1-roof1" o "D2-tunnelB"
-                    
-                    # A) Separamos por el guion para sacar el destino
+                    #   "D1-roof1" o "D2-tunnelB"
                     parts = m.split("-")
                     destination = parts[1] if len(parts) > 1 else ""
-                    
-                    # B) Buscamos la zona (el hub) en el grafo de tu mapa
-                    zone_color = "none"
+                    zone_color: str = "none"
                     if destination in self.grapho.hubs:
-                        # Extraemos el color de los metadatos del mapa ([color=red], etc.)
-                        zone_color = self.grapho.hubs[destination].color
-                    # C) Traducimos el nombre del color ("red", "green"...) al código ANSI de la terminal
+                        hub = self.grapho.hubs[destination]
+                        zone_color = hub.color or "none"
                     ansi_code = COLOR_MAP.get(zone_color.lower(), "")
-                    
-                    # D) Si tiene color, envolvemos el texto con el código y el RESET_COLOR al final
+
                     if ansi_code:
-                        colored_movements.append(f"{ansi_code}{m}{RESET_COLOR}")
+                        colored_movements.append(
+                            f"{ansi_code}{m}{RESET_COLOR}")
                     else:
-                        # Si no tiene color definido, se queda con el texto normal
                         colored_movements.append(m)
 
-                # 4. Imprimimos todos los movimientos del turno separados por espacios
                 print(" ".join(colored_movements))
